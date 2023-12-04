@@ -9,12 +9,11 @@ let sum = 0
 
 puzzleData.forEach((game, gameIndex)=>{
     const match = game.match(regex)
-    console.log({match})
     const isValid = match.every((result)=>{
         const splitResult = result.split(' ')
-        if (splitResult[1].includes('red') && Number(splitResult[0]) >= 12 
-        || splitResult[1].includes('green') && Number(splitResult[0]) >= 13 
-        || splitResult[1].includes('red') && Number(splitResult[0]) >= 14) {
+        if (splitResult[1].includes('red') && Number(splitResult[0]) > 12 
+        || splitResult[1].includes('green') && Number(splitResult[0]) > 13 
+        || splitResult[1].includes('blue') && Number(splitResult[0]) > 14) {
             console.log('invalid game', gameIndex + 1)
             return false
         }
