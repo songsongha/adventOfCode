@@ -40,27 +40,24 @@ listOfSymbols.forEach((row, rowIndex)=>{
         if (rowIndex > 0){
             listOfNumbers[rowIndex-1].forEach(numberEntry=>{
                 if (isAdjacent(numberEntry, symbolEntry)){
-                    console.log(numberEntry[0], 'is next to a symbol')
                     sum+= Number(numberEntry[0])
-                    // remove entry to prevent double counting
+
                 }
             })
         }
         // check same row
             listOfNumbers[rowIndex].forEach(numberEntry=>{
                 if (isAdjacent(numberEntry, symbolEntry)){
-                    console.log(numberEntry[0], 'is next to a symbol')
                     sum+= Number(numberEntry[0])
-                    // remove entry to prevent double counting
+
                 }
             })
         // check row below
         if (rowIndex < listOfSymbols.length -1){
             listOfNumbers[rowIndex+1].forEach(numberEntry=>{
                 if (isAdjacent(numberEntry, symbolEntry)){
-                    console.log(numberEntry[0], 'is next to a symbol')
                     sum+= Number(numberEntry[0])
-                    // remove entry to prevent double counting
+
                 }
             })
         }
@@ -69,3 +66,51 @@ listOfSymbols.forEach((row, rowIndex)=>{
 
 console.log({sum})
 
+// Problem 2: Find all the * adjacent to two numbers, multiply the two numbers, and sum the total.
+let gearRatioSum = 0
+const isGearRegex = /\*/g
+
+
+const listOfGears = puzzleData.map((line)=>{
+   return [...line.matchAll(isGearRegex)]
+})
+const gearObject = {}
+
+listOfGears.forEach((row, rowIndex)=>{
+    row.forEach((gearEntry) => {
+        const gearId = `gear-row${rowIndex}col${gearEntry.index}`
+        
+        if (!gearObject[gearId]) gearObject[gearId] = []
+        // check row above
+        if (rowIndex > 0){
+            listOfNumbers[rowIndex-1].forEach(numberEntry=>{
+                if (isAdjacent(numberEntry, gearEntry)){
+                    gearObject[gearId].push(numberEntry[0])
+                }
+            })
+        }
+        // check same row
+            listOfNumbers[rowIndex].forEach(numberEntry=>{
+                if (isAdjacent(numberEntry, gearEntry)){
+                    gearObject[gearId].push(numberEntry[0])
+                }
+            })
+        // check row below
+        if (rowIndex < listOfSymbols.length -1){
+            listOfNumbers[rowIndex+1].forEach(numberEntry=>{
+                if (isAdjacent(numberEntry, gearEntry)){
+                    gearObject[gearId].push(numberEntry[0])
+                }
+            })
+        }
+    })
+})
+
+for (key in gearObject) {
+    if (gearObject[key].length === 2){
+        const gearRatio = gearObject[key][0] * gearObject[key][1]
+        gearRatioSum += gearRatio
+    }
+}
+
+console.log({gearRatioSum})
