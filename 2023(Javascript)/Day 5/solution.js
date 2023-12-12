@@ -9,7 +9,8 @@ console.log({puzzleData})
 const regex = /\d+/g
 
 let nullCounter = 0
-let mapArray = new Array(8)
+const mapArray = new Array(8)
+const locationArray = []
 
 puzzleData.forEach((line)=>{
     const match = line.match(regex)
@@ -19,16 +20,36 @@ puzzleData.forEach((line)=>{
         const mapIndex = nullCounter/2
         if (!mapArray[mapIndex]) {
             mapArray[mapIndex] = []
-        }
-       mapArray[mapIndex].push(match)
+        } 
+       mapArray[mapIndex].push(match.map(str => Number(str)))
     }
 })
 
-// const seeds = []
-// const seedToSoil = []
-// const soilToFertilizer = []
-// const fertilizerToWater = []
-// const waterToLight = []
-// const lightToTemp = []
-// const tempToHumidity = []
-// const humidityToLocation = []
+// for each seed
+mapArray[0][0].forEach(seed => {
+    // find corresponding soil -> location
+    let refSource = seed
+    for(let i = 1; i < mapArray.length; i++){
+        console.log({refSource})
+        for(let j = 0; j < mapArray[i].length; j++){
+            const source = mapArray[i][j][1]
+            const destination = mapArray[i][j][0]
+            const range = mapArray[i][j][2]
+            if (refSource >= source && refSource <= source + range) {
+                // refSource falls in the range
+                refSource = destination + refSource - source
+                break
+            } // otherwise refSource should remain the same
+        }
+
+        // if we are on location
+        if (i === mapArray.length -1) {
+            locationArray.push(refSource)
+        }
+        
+    }
+
+})
+
+console.log({locationArray})
+console.log('Minimum value', Math.min(...locationArray))
