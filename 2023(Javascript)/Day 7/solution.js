@@ -4,7 +4,7 @@ const fs = require('fs')
 
 // put inputs from text file into an array
 const puzzleData = fs.readFileSync('./input.txt', 'utf8').split('\n')
-console.log({puzzleData})
+
 const cardStrengthOrder = ['2', '3','4','5','6','7','8','9','T','J','Q','K','A' ]
 const handStrengthOrder = ['HC','1P', '2P', 'TOK', 'FH', '4OK', '5OK']
 
@@ -20,11 +20,10 @@ const handType = (hand)=>{
             charMap[char] = 1
         }
     }
-    console.log({charMap})
+
     let handType = ''
     const numberOfUniqueChars = Object.keys(charMap).length
     const duplicateArray = Object.values(charMap)
-    console.log({duplicateArray})
 
     // ['HC','1P', '2P', 'TOK', 'FH', '4OK', '5OK']
     switch (numberOfUniqueChars) {
@@ -65,18 +64,30 @@ const handData = puzzleData.map(line =>{
         bid: Number(line.match(bidRegex))
     }
 })
-console.log({handData})
+// console.log({handData})
 
 // rank the type of hands we have
 handData.sort((handA,handB)=> {
     if (handA.handType !== handB.handType) {
         // descending order
-        return handStrengthOrder.indexOf(handB.handType) - handStrengthOrder.indexOf(handA.handType)
+        return handStrengthOrder.indexOf(handA.handType) - handStrengthOrder.indexOf(handB.handType)
+    } else if (handB.hand[0] !== handA.hand[0]) {
+        return cardStrengthOrder.indexOf(handA.hand[0]) - cardStrengthOrder.indexOf(handB.hand[0]) 
+    } else if (handB.hand[1] !== handA.hand[1]){
+        return cardStrengthOrder.indexOf(handA.hand[1]) - cardStrengthOrder.indexOf(handB.hand[1]) 
+    } else if (handB.hand[2] !== handA.hand[2]){
+        return cardStrengthOrder.indexOf(handA.hand[2]) - cardStrengthOrder.indexOf(handB.hand[2]) 
+    }else if (handB.hand[3] !== handA.hand[3]){
+        return cardStrengthOrder.indexOf(handA.hand[3]) - cardStrengthOrder.indexOf(handB.hand[3]) 
     } else {
-        return cardStrengthOrder.indexOf(handB.hand[0]) - cardStrengthOrder.indexOf(handA.hand[0]) 
-    } 
+        return cardStrengthOrder.indexOf(handA.hand[4]) - cardStrengthOrder.indexOf(handB.hand[4]) 
+    }
 })
 
-console.log('handDataSorted', handData)
-
 // multiply the bids by the rank
+let winnings = 0
+handData.forEach((hand, index) =>{
+    const { bid } = hand
+    winnings += bid * (index+1)
+})
+console.log({winnings})
