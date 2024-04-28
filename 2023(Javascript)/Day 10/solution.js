@@ -1,4 +1,6 @@
-// Problem 1: 
+// Problem 1: Furthest step in the loop
+// Problem 2: how many tiles are inside the loop?
+// Ray casting method, count how many times it crossing the loop border, odd is inside, even is outside
 const fs = require('fs')
 
 // put inputs from text file into an array
@@ -26,6 +28,9 @@ const charMap = {
 const isSameLocation = (point1, point2)=>{
  return point1[0] === point2[0] && point1[1] === point2[1]
 }
+const pathArray = [[...startLocation]]
+
+console.log({pathArray})
 // look at all the adjacent squares for connecting pipes
 let currentLocation = [...startLocation]
     const row = currentLocation[0]
@@ -43,6 +48,7 @@ if (northPoint[0] >= 0){
         nextPipe = char
         previousDirection = 'south'
         currentLocation = northPoint
+        pathArray.push(northPoint)
     }
 }
 if (!nextPipe && southPoint[0] < puzzleData.length){
@@ -51,6 +57,7 @@ if (!nextPipe && southPoint[0] < puzzleData.length){
         nextPipe = char
         previousDirection = 'north'
         currentLocation = southPoint
+        pathArray.push(southPoint)
     }
 }
 if (!nextPipe && eastPoint[0] < puzzleData[0].length){
@@ -59,6 +66,7 @@ if (!nextPipe && eastPoint[0] < puzzleData[0].length){
         nextPipe = char
         previousDirection = 'west'
         currentLocation = eastPoint
+        pathArray.push(eastPoint)
     }
 }
 if (!nextPipe && westPoint[0] >= 0 ){
@@ -67,6 +75,7 @@ if (!nextPipe && westPoint[0] >= 0 ){
         nextPipe = char
         previousDirection = 'east'
         currentLocation = westPoint
+        pathArray.push(westPoint)
     }
 }
 let pathCounter = 1
@@ -80,26 +89,32 @@ while (nextPipe !== 'S'){
             nextPipe = puzzleData[currentLocation[0]-1][currentLocation[1]]
             currentLocation = [currentLocation[0]-1, currentLocation[1] ]
             previousDirection = 'south'
+            pathArray.push(currentLocation)
             break
         case 'south':
             nextPipe = puzzleData[currentLocation[0]+1][currentLocation[1]]
             currentLocation = [currentLocation[0]+1 , currentLocation[1]]
             previousDirection = 'north'
+            pathArray.push(currentLocation)
             break
         case 'east':
             nextPipe = puzzleData[currentLocation[0]][currentLocation[1]+1]
             currentLocation = [currentLocation[0], currentLocation[1]+1]
             previousDirection = 'west'
+            pathArray.push(currentLocation)
             break
         case 'west':
             nextPipe = puzzleData[currentLocation[0]][currentLocation[1]-1]
             currentLocation = [currentLocation[0], currentLocation[1]-1]
             previousDirection = 'east'
+            pathArray.push(currentLocation)
             break
     }
-console.log({nextPipe})
-console.log({currentLocation})
 }
+
+console.log({pathArray})
 console.log({pathCounter})
 const furthestStep = pathCounter/2
 console.log({furthestStep})
+
+// loop over puzzle data and check to see if the ray cast is odd or even 
