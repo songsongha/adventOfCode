@@ -2,6 +2,8 @@
 // Problem 2: how many tiles are inside the loop?
 // Ray casting method, count how many times it crossing the loop border, odd is inside, even is outside
 const fs = require('fs')
+const path = require('path')
+const { start } = require('repl')
 
 // put inputs from text file into an array
 // find the S
@@ -112,9 +114,61 @@ while (nextPipe !== 'S'){
     }
 }
 
+pathArray.pop() // remove the duplicate S location
 console.log({pathArray})
 console.log({pathCounter})
 const furthestStep = pathCounter/2
 console.log({furthestStep})
-
+// if two pipes connecting into the start location are in the same row, replace the S in the puzzleData with a '-'
+if (pathArray[1][0] === pathArray[pathArray.length-1][0]){
+    puzzleData[startLocation[0]][startLocation[1]] = '-'
+    console.log(puzzleData)
+}
 // loop over puzzle data and check to see if the ray cast is odd or even 
+const isPointInPathArray = ( row, col ) =>{
+    return pathArray.filter(coord => coord[0] === row && coord[1] === col).length
+}
+const isHoriztontalEdge = (row, col) =>{
+    const char = puzzleData[row][col]
+    if (isPointInPathArray(row, col)) {
+        if (char === '-'){
+            return true
+        } else if ((char === 'L' || char === 'F') && puzzleData[row][col+1] === '-' ) {
+            return true
+        } else if ((char === 'J' || char === '7') && puzzleData[row][col-1] === '-'){
+            return true
+        } else {
+            return false
+        }
+    } else {
+        console.log('not in the bounday')
+        return false
+    }
+}
+let enclosedByLoopCount = 0
+puzzleData.forEach((row, rowIndex) => {
+    console.log({row})
+    row.forEach((tile, colIndex) =>{
+        // if the tile is part of the pipe no need to raycast
+        // if (pathArray.filter(coord => coord[0] === rowIndex && coord[1] === colIndex).length){
+        if (isPointInPathArray(rowIndex,colIndex)){
+            console.log('tile is part of the loop')
+        } else {
+            // raycast check it if the tile the ray is on is a '-', if so don't count it as it's an edge
+            let crossBoundaryCount = 0
+            for(let rayCol = colIndex + 1; rayCol < puzzleData[0].length; rayCol++ ){
+                if (isPointInPathArray(rowIndex, rayCol) && !isHoriztontalEdge(rowIndex,rayCol)){
+                    crossBoundaryCount++
+                }
+            }
+            console.log({crossBoundaryCount})
+            if (crossBoundaryCount%2) {
+                console.log('point is inside the loop')
+                enclosedByLoopCount++
+            } else {
+                console.log('point is outside the loop')
+            }
+        }
+    })
+    console.log({enclosedByLoopCount})
+})
