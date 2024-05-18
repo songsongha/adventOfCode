@@ -1,4 +1,5 @@
 // Problem 1: How many different arrangements of operational and broken springs fit the given criteria in each row and what are the sums of those values?
+// Problem 2: conditionRepor is expanded, now how many possibibilities exist and what is the sum?
 
 const fs = require('fs')
 
@@ -10,6 +11,19 @@ const countSpringArrangements = (conditionReport, damageArray, memo = {}) => {
     // return a number
 if (conditionReport.includes('?')) {
     // if the conditionReport has unknowns, create all the possible branches
+    console.log({conditionReport})
+    // check if we need to prune the branch
+    const reportGroupings = conditionReport.split('.').filter(item=>!!item)
+    console.log({reportGroupings})
+    for (let i = 0; i < damageArray.length; i++){
+        if (reportGroupings[i].includes('?')){
+            // don't bother with rest of the for loop if we have an unknown
+            break
+        } else if (reportGroupings[i].length !== damageArray[i]){
+            console.log('grouping doesnot match, should return 0')
+            return 0
+        }
+    }
     const springOptions = ['.', '#']
     for (let option of springOptions) {
         const newConditionReport = conditionReport.replace('?', option)
