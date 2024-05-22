@@ -22,11 +22,9 @@ const checkMirrorLine = (index, pattern) => {
 const findVertMirrorIndex = (pattern) => {
     let mirrorIndex = null
     for (let colIndex = 0; colIndex < pattern[0].length -1; colIndex++){
-        for (let rowIndex = 0; rowIndex < pattern.length -1; rowIndex++){
+        for (let rowIndex = 0; rowIndex < pattern.length; rowIndex++){
             if (pattern[rowIndex][colIndex] === pattern[rowIndex][colIndex+1]) {
-                // console.log('matches')
-                if(rowIndex === pattern.length -2){
-                    console.log('last row')
+                if(rowIndex === pattern.length -1){
                     // this is the last row so everything before is also mirror
                     // check all of the columns out of this axis til you reach an end
                     if (checkMirrorLine(colIndex,pattern)){
@@ -36,7 +34,6 @@ const findVertMirrorIndex = (pattern) => {
                     }      
                 }
             } else {
-                // console.log('break')
                 // move on to the next column
                 break
             }
@@ -54,14 +51,11 @@ let sum = 0
 puzzleData.forEach(pattern => {
     // check for vertical mirror 
     const vertMirrorIndex = findVertMirrorIndex(pattern)
-    console.log({vertMirrorIndex})
     if (vertMirrorIndex === null) {
         // transpose the pattern
         const transposedPattern = transpose(pattern)
-        console.log({transposedPattern})
         // redo the action
         const horizMirrorIndex = findVertMirrorIndex(transposedPattern)
-        console.log({horizMirrorIndex})
         // add amount to total
         if(horizMirrorIndex === null) throw new Error('both hoeizontal and vertical are null!!')
         sum += (horizMirrorIndex + 1) * 100
