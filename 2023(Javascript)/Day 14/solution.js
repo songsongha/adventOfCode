@@ -7,20 +7,23 @@ const fs = require('fs')
 const puzzleData = fs.readFileSync('./input.txt', 'utf8').split('\n')
 console.log({puzzleData})
 
-const bolderTracker = new Array(puzzleData[0].length).fill(0)
+const bolderTracker = new Array(puzzleData.length).fill(0)
 console.log({bolderTracker})
-
-puzzleData.forEach(line=>{
+let blockageTracker = new Array(puzzleData[0].length).fill(0)
+puzzleData.forEach((line, row) => {
     for(let i = 0; i < line.length; i++){
-        if (line[i] === 'O') bolderTracker[i]++
+        if (line[i] === 'O') {
+            bolderTracker[blockageTracker[i]]++
+            blockageTracker[i]++
+        } else if (line[i] === '#'){
+            blockageTracker[i] = row + 1
+        }
     }
 })
 console.log({bolderTracker})
 let totalLoad = 0
-bolderTracker.forEach(colCount =>{
-for (let i = 0; i < colCount ; i++){
-    const distanceFromSouth = puzzleData.length - i
-    totalLoad += distanceFromSouth 
+for (let i = 0; i < bolderTracker.length ; i++){
+    const distanceFromSouth = bolderTracker.length - i
+    totalLoad += distanceFromSouth * bolderTracker[i]
 }
-})
 console.log({totalLoad})
