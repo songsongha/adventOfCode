@@ -1,5 +1,5 @@
 // Problem 1: Find number of energized tiles
-// Problem 2: 
+// Problem 2: Find max value of energized tiles
 
 const fs = require('fs')
 
@@ -136,3 +136,34 @@ followlightPath('L', '0,0', energizedTilesMap )
 
 // console.log({energizedTilesMap})
 console.log(energizedTilesMap.size)
+
+// Part 2
+let max = 0
+const energizedTilesMap2 = new Map()
+followlightPath ('U', '0,4', energizedTilesMap2)
+console.log(energizedTilesMap2.size)
+// for (let rowIndex =  0; rowIndex < puzzleData.length; rowIndex++){
+//     const energizedTilesMap2 = new Map()
+//     const position = `${rowIndex},0`
+//     followlightPath('L', position, energizedTilesMap2 )
+//     if (energizedTilesMap2.size > max) max = energizedTilesMap2.size
+// }
+// for (let rowIndex =  0; rowIndex < puzzleData.length; rowIndex++){
+//     const energizedTilesMap2 = new Map()
+//     const position = `${rowIndex},${puzzleData.length -1}`
+//     followlightPath('R', position, energizedTilesMap2 )
+//     if (energizedTilesMap2.size > max) max = energizedTilesMap2.size
+// }
+// for (let colIndex =  0; colIndex < puzzleData.length; colIndex++){
+//     const energizedTilesMap2 = new Map()
+//     const position = `0,${colIndex}`
+//     followlightPath('U', position, energizedTilesMap2 )
+//     if (energizedTilesMap2.size > max) max = energizedTilesMap2.size
+// }
+// for (let colIndex =  0; colIndex < puzzleData.length; colIndex++){
+//     const energizedTilesMap2 = new Map()
+//     const position = `${puzzleData[0].length -1},${colIndex}`
+//     followlightPath('D', position, energizedTilesMap2 )
+//     if (energizedTilesMap2.size > max) max = energizedTilesMap2.size
+// }
+
