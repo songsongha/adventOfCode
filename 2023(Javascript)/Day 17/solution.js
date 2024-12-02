@@ -27,18 +27,24 @@ const heatMap = new Map()
 const data = {
     heatLoss: puzzleData[0][0],
     direction: null,
-    directionCount: 0
+    directionCount: 0,
+    prevNode: null
 }
 heatMap.set('0,0', data ) 
 
-function setHeatMapData(newHeatLoss, location, direction) {
+function setHeatMapData(newHeatLoss, location, direction, prevNode) {
     const prevDirection = heatMap.get(location)?.direction
-    const prevDirectionCount = heatMap.get(location)?.directionCount
+    const prevDirectionCount = heatMap.get(location)?.directionCount || 0
+    console.log({location})
+    console.log({prevDirection})
+    console.log({direction})
+    console.log(prevDirection === direction)
 
         const value = {
             heatLoss: newHeatLoss,
-            direction: direction,
-            directionCount: prevDirection === direction ? prevDirectionCount + 1 : 1
+            direction,
+            directionCount: (prevDirection === direction ? prevDirectionCount + 1 : 1),
+            prevNode
         }
         heatMap.set(location, value)
 
@@ -47,56 +53,72 @@ function setHeatMapData(newHeatLoss, location, direction) {
 while (queue.length > 0) {
     const location = queue.shift().map(str => Number(str))
     const [row, col] = location
-    console.log({row})
-    console.log({col})
-    const minCumulativeHeatLossAtLocation = heatMap.get(`${row},${col}`).heatLoss
-    const direction = heatMap.get(`${row},${col}`).direction
-    const directionCount = heatMap.get(`${row},${col}`).directionCount
-
+    const originalLocation = `${row},${col}`
+    const minCumulativeHeatLossAtLocation = heatMap.get(originalLocation).heatLoss
+    const direction = heatMap.get(originalLocation).direction
+    const directionCount = heatMap.get(originalLocation).directionCount
+console.log({originalLocation})
     // check adjacent squares 
     if (row + 1 < puzzleData.length && (directionCount < DIRECTION_LIMIT || direction !== 'down') ){
         const location = `${row + 1},${col}`
+        console.log('down adjacent location', location)
         const newHeatLoss = puzzleData[row + 1][col] + minCumulativeHeatLossAtLocation
         const prevValue = heatMap.get(location)?.heatLoss
 
         if (!prevValue || newHeatLoss < prevValue) {
-            setHeatMapData(newHeatLoss, location, 'down')
+            console.log('there was no prev value or new heatloss is less!. prevValue', prevValue,"newHeatLoss", newHeatLoss)
+            setHeatMapData(newHeatLoss, location, 'down', originalLocation )
         }
     }
     if (row - 1 >= 0 && (directionCount < DIRECTION_LIMIT || direction !== 'up')){
         const location = `${row - 1},${col}`
+        console.log('up adjacent location', location)
         const newHeatLoss = puzzleData[row - 1][col] + minCumulativeHeatLossAtLocation
         const prevValue = heatMap.get(location)?.heatLoss
 
         if (!prevValue || newHeatLoss < prevValue) {
-            setHeatMapData(newHeatLoss, location, 'up')
+            console.log('there was no prev value or new heatloss is less!. prevValue', prevValue,"newHeatLoss", newHeatLoss)
+            setHeatMapData(newHeatLoss, location, 'up', originalLocation)
         }
     }
     if (col + 1 < puzzleData[0].length && (directionCount < DIRECTION_LIMIT || direction !== 'right')){
         const location = `${row},${col+1}`
+        console.log('right adjacent location', location)
         const newHeatLoss = puzzleData[row][col+1] + minCumulativeHeatLossAtLocation
         const prevValue = heatMap.get(location)?.heatLoss
 
         if (!prevValue || newHeatLoss < prevValue) {
-            setHeatMapData(newHeatLoss, location, 'right')
+            console.log('there was no prev value or new heatloss is less!. prevValue', prevValue,"newHeatLoss", newHeatLoss)
+            setHeatMapData(newHeatLoss, location, 'right', originalLocation)
         }
     }
     if (col - 1 >= 0 && (directionCount < DIRECTION_LIMIT || direction !== 'left')){
         const location = `${row},${col-1}`
+        console.log('left', location)
         const newHeatLoss = puzzleData[row][col-1] + minCumulativeHeatLossAtLocation
         const prevValue = heatMap.get(location)?.heatLoss
 
         if (!prevValue || newHeatLoss < prevValue) {
-            setHeatMapData(newHeatLoss, location, 'left')
+            console.log('there was no prev value or new heatloss is less!. prevValue', prevValue,"newHeatLoss", newHeatLoss)
+            setHeatMapData(newHeatLoss, location, 'left', originalLocation)
         }
     }
     puzzleData[row][col] = null
-    console.log(heatMap)
+
     const nextNode = getMinOfMap(heatMap)
     if(nextNode === null) break
     queue.push(nextNode.split(','))
 
     
 }
+const endLocation = `${puzzleData.length -1},${puzzleData[0].length-1}`
+console.log({endLocation})
 
-console.log(heatMap.get(`${puzzleData.length -1},${puzzleData[0].length-1}`))
+let currHeatNode = heatMap.get(`${puzzleData.length -1},${puzzleData[0].length-1}`)
+while (currHeatNode.prevNode !== null){
+    console.log('prevNode', currHeatNode.prevNode, currHeatNode.heatLoss)
+    console.log('direction', currHeatNode.direction, currHeatNode.directionCount)
+    currHeatNode = heatMap.get(currHeatNode.prevNode)
+}
+
+// console.log(heatMap.get(`${puzzleData.length -1},${puzzleData[0].length-1}`))
