@@ -15,7 +15,21 @@ left_column.sort()
 right_column.sort()
 
 sum = 0
+similarity_score = 0
+occurence_hash = {}
 for i in range(len(left_column)):
-    sum += abs(left_column[i] - right_column[i])
+    left = left_column[i]
+    right = right_column[i]
+    # Part 1
+    sum += abs(left - right)
+    # Part 2
+    if not left in occurence_hash:
+        occurence_in_right = len([num for num in right_column if num == left])
+        occurence_hash[left] = occurence_in_right
     
-print(sum)
+    similarity_score += left * occurence_hash[left]
+
+    
+print('sum', sum)
+print('similarity score', similarity_score)
+
