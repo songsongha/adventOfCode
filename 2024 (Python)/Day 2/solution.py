@@ -8,7 +8,7 @@ with open("inputs.txt", "r") as file:
 
 def isSafe(report):
     is_increasing = None
-    for i in range(len(report)-2):
+    for i in range(len(report)-1):
         difference = report[i+1] - report[i]
         if difference == 0:
             return False
@@ -27,4 +27,3 @@ for report in report_array:
         safe_count +=1
     
 print(safe_count)        
-
