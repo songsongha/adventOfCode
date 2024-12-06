@@ -26,4 +26,22 @@ for report in report_array:
     if isSafe (report) is True:
         safe_count +=1
     
-print(safe_count)        
+print('Part 1', safe_count)        
+
+def canBeSafe (report): 
+    if isSafe(report) is True:
+        return True
+    
+    for i in range(len(report)):
+        modified_report = report.copy()
+        del modified_report[i]
+        if isSafe(modified_report):
+            return True
+    return False
+    
+safe_count2 = 0
+for report in report_array:
+    if canBeSafe(report) is True:
+        safe_count2 +=1
+
+print('Part 2', safe_count2)
