@@ -42,7 +42,7 @@ dial_position = 50
 for line in instructions:
     direction = line[0]
     amount = int(line[1:])  
-    print('amount', amount)
+    print('line', line)
     print('dial position', dial_position)
 
     if direction == 'L':
@@ -50,21 +50,14 @@ for line in instructions:
     elif direction == 'R':
         new_instruction = dial_position + amount
     print('new instruction', new_instruction)        
-    if amount and new_instruction == 0:
-        print('increment')
-        zero_count += 1
-    # the problem here is that div mod when new_dial_positions is negative will round to -1 when the answer is 0
-    # rotations, new_dial_position = divmod(new_instruction, 100)
 
+    # can't use div mode here because a negative number will round towards negative infinisty instead of toward zero
     rotations = abs(int(new_instruction / 100))
     print('rotations', rotations)
     new_dial_position = new_instruction % 100
     print('new dial position', new_dial_position)
-    dial_position = new_dial_position
-    if new_instruction < 0 and rotations == 0:
+    if (new_instruction < 0 and dial_position > 0) or (new_dial_position == 0 and rotations == 0):
         rotations += 1
-        print('rotation incremented!', rotations)
-
     zero_count += abs(rotations)
     print ('new zero count', zero_count)
     dial_position = new_dial_position
