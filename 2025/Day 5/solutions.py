@@ -28,47 +28,72 @@ available_ingredients = after_break.strip().split('\n')
 already_counted = []
 id_count = 0
 for id in fresh_ids:
-    print('already_counted', already_counted)
     current_start, current_end = map(int, id.split('-'))
     print('current start and end',(current_start, current_end))
     
     # recheck the already counted array until everything is combined.
     # don't do the range out until the end??
-    for i, (start, end) in enumerate(already_counted):
+    merged = False
+    for i, (start, end) in enumerate(already_counted.copy()):
         if start <= current_start <= end and start <= current_end <= end:
             print('count has already been counted')
-            continue 
+            merged = True
+            continue
         elif current_start <= start and end <= current_end:
             print('new range is larger than previous range')
             already_counted[i] = (current_start, current_end) 
+            merged = True
         elif start <= current_start <= end:
             duplicates = (end - current_start + 1) 
             already_counted[i] = (start, current_end)
+            merged = True
         elif start <= current_end <= end:
             duplicates = (current_end - start + 1)
             already_counted[i] = (current_start, end)
-        else:
-            already_counted.append((current_start,current_end))    
-    if len(already_counted) == 0:
+            merged = True  
+    if not merged:
         already_counted.append((current_start,current_end))
-
+    print(already_counted)        
+filtered = list(set(already_counted))
 print ('go over the array again to check that there are ranges')
-for i, (start, end) in enumerate(already_counted):
-    for j in range(len(already_counted)):
-        if i == j: continue
-        (next_start, next_end) = already_counted[j]
-        if start <= current_start <= end and start <= current_end <= end:
-            print('count has already been counted')
-            continue 
-        elif current_start <= start and end <= current_end:
-            print('new range is larger than previous range')
-            already_counted[i] = (current_start, current_end) 
-        elif start <= current_start <= end:
-            duplicates = (end - current_start + 1) 
-            already_counted[i] = (start, current_end)
-        elif start <= current_end <= end:
-            duplicates = (current_end - start + 1)
-            already_counted[i] = (current_start, end)
+while True:
+    filtered_copy = filtered.copy()
+    modification_made = False
+    for i, (current_start, current_end) in enumerate(filtered_copy):
+        for j in range(len(filtered_copy)):
+            if i == j: continue
+            (start, end) = filtered_copy[j]
+            if start <= current_start <= end and start <= current_end <= end:
+                # i range is contained within j range, so keep j_range
+                filtered[i] = None
+                modification_made = True
+                continue 
+            elif current_start <= start and end <= current_end:
+                # i range is larger than j range, so keep i range
+                filtered[j] = None 
+                modification_made = True
+            elif start <= current_start <= end:
+                # remove i and modify j
+                filtered[i] = None
+                filtered[j] = (start, current_end)
+                modification_made = True
+            elif start <= current_end <= end:
+                # remove i and modify j
+                filtered[i] = None
+                filtered[j] = (current_start, end)
+                modification_made = True
+        # if we made modifications for this particular entry, restart looking at i entries        
+        if modification_made == True: 
+            filtered = list(filter(None, filtered))
+            break
+    if modification_made == False:
+        # went through the entire array with no mods
+        break
 
-# now loop over 
+print(filtered)   
+# now loop over to count
+for (start, end) in filtered:
+    id_count += end - start + 1
+
+
 print(' final id_count',id_count)
