@@ -31,8 +31,6 @@ for id in fresh_ids:
     print('already_counted', already_counted)
     current_start, current_end = map(int, id.split('-'))
     print('current start and end',(current_start, current_end))
-    range_count = current_end - current_start + 1
-    print('range count. before', range_count)
     
     # recheck the already counted array until everything is combined.
     # don't do the range out until the end??
@@ -42,26 +40,35 @@ for id in fresh_ids:
             continue 
         elif current_start <= start and end <= current_end:
             print('new range is larger than previous range')
-            duplicates = (end - start + 1)
-            range_count = range_count - duplicates
             already_counted[i] = (current_start, current_end) 
         elif start <= current_start <= end:
             duplicates = (end - current_start + 1) 
-            range_count = range_count - duplicates
-            print('modify range count', range_count)
             already_counted[i] = (start, current_end)
         elif start <= current_end <= end:
             duplicates = (current_end - start + 1)
-            range_count = range_count - duplicates
-            print('modify range count', range_count)
             already_counted[i] = (current_start, end)
         else:
             already_counted.append((current_start,current_end))    
-
-    print('range count. after', range_count)
-    id_count += range_count
-    print('id_count!', id_count)
     if len(already_counted) == 0:
         already_counted.append((current_start,current_end))
 
+print ('go over the array again to check that there are ranges')
+for i, (start, end) in enumerate(already_counted):
+    for j in range(len(already_counted)):
+        if i == j: continue
+        (next_start, next_end) = already_counted[j]
+        if start <= current_start <= end and start <= current_end <= end:
+            print('count has already been counted')
+            continue 
+        elif current_start <= start and end <= current_end:
+            print('new range is larger than previous range')
+            already_counted[i] = (current_start, current_end) 
+        elif start <= current_start <= end:
+            duplicates = (end - current_start + 1) 
+            already_counted[i] = (start, current_end)
+        elif start <= current_end <= end:
+            duplicates = (current_end - start + 1)
+            already_counted[i] = (current_start, end)
+
+# now loop over 
 print(' final id_count',id_count)
