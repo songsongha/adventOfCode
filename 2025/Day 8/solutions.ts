@@ -1,5 +1,6 @@
-const fs = require('fs')
+import fs from 'fs'
 
+console.time('runtime')
 const MAX_CONNECTION = 10
 type Coordinate = [number, number, number]
 type DistanceObject = { from: string; to: string; distance: number }
@@ -27,15 +28,12 @@ const sortedInsert = (sortedArray: DistanceObject[], item: DistanceObject) => {
 }
 
 const junctionData = fs.readFileSync('./inputs.txt', 'utf8').split('\n')
-console.log(junctionData)
 const allDistances: DistanceObject[] = []
 // Part 1:  Need to connect 1000 (10 for sample) pairs of junction boxes
 // find shortest straight line distance
 // track sizes of the circuits
 // multiply the largest circuits
-const circuitSets: Array<Set<string>> = []
-// make the DistanceObject
-const allDistancesSorted = false
+
 for (let i = 0; i < junctionData.length; i++) {
     const coord1 = junctionData[i]
     for (let j = i + 1; j < junctionData.length; j++) {
@@ -46,12 +44,47 @@ for (let i = 0; i < junctionData.length; i++) {
             to: coord2,
             distance: distance
         }
-        if (allDistances.length <= MAX_CONNECTION) allDistances.push(description)
-        else sortedInsert(allDistances, description)
+        sortedInsert(allDistances, description)
     }
-    // sort once we fill array to 10
-    if (!allDistancesSorted && allDistances.length === MAX_CONNECTION)
-        allDistances.sort((a, b) => a.distance - b.distance)
 }
-// now i have the shortest distances,
-// but I need to check if they were ever actually connected because nothing happens
+// now i have the shortest connections, need to create circuits
+
+const circuitSetArray: Array<Set<string>> = []
+allDistances.forEach((connection) => {
+    const { from, to } = connection
+    let hasBeenAdded = false
+    for (const circuit of circuitSetArray) {
+        if (circuit.has(from) || circuit.has(to)) {
+            circuit.add(from)
+            circuit.add(to)
+            hasBeenAdded = true
+        }
+    }
+    if (!hasBeenAdded) circuitSetArray.push(new Set([from, to]))
+})
+
+// now I need to check for  for duplicates in the set and merge them
+for (let i = 0; i < circuitSetArray.length; i++) {
+    const circuit1 = circuitSetArray[i]
+    for (let j = i + 1; j < circuitSetArray.length; j++) {
+        const circuit2 = circuitSetArray[j]
+        const hasOverLap = [...circuit1].some((val) => circuit2.has(val))
+        if (hasOverLap) {
+            circuitSetArray[i] = new Set([...circuit1, ...circuit2])
+            circuitSetArray.splice(j, 1)
+            j-- // since we removed an element.
+        }
+    }
+}
+console.log({ circuitSetArray })
+// now I need to sort by size and get the size
+circuitSetArray.sort((a, b) => b.size - a.size)
+let answer = 1
+for (let i = 0; i < 3; i++) {
+    const size = circuitSetArray[i].size
+    answer *= size
+    console.log({ size })
+}
+
+console.log(answer)
+console.timeEnd('runtime')
