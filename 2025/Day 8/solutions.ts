@@ -24,7 +24,7 @@ const sortedInsert = (sortedArray: DistanceObject[], item: DistanceObject) => {
         else high = mid
     }
     sortedArray.splice(low, 0, item)
-    if (sortedArray.length > MAX_CONNECTION) sortedArray.pop()
+    // if (sortedArray.length > MAX_CONNECTION) sortedArray.pop()
 }
 
 const junctionData = fs.readFileSync('./inputs.txt', 'utf8').split('\n')
@@ -33,6 +33,9 @@ const allDistances: DistanceObject[] = []
 // find shortest straight line distance
 // track sizes of the circuits
 // multiply the largest circuits
+
+// Part 2, connect all the circuits into one circuit.
+// get x coordinates of from / to and multiply them
 
 for (let i = 0; i < junctionData.length; i++) {
     const coord1 = junctionData[i]
@@ -47,11 +50,15 @@ for (let i = 0; i < junctionData.length; i++) {
         sortedInsert(allDistances, description)
     }
 }
-console.log({ allDistances })
+console.log('All Distances complete')
 // now i have the shortest connections, need to create circuits
 
 const circuitSetArray: Array<Set<string>> = []
-allDistances.forEach((connection) => {
+
+// instead of going through allDistances in part one, check until set size is length of junctionData
+
+// allDistances.forEach((connection) => {
+for (const connection of allDistances) {
     const { from, to } = connection
 
     // find which existing circuits contain 'from' and 'to'
@@ -74,17 +81,22 @@ allDistances.forEach((connection) => {
         // neither exists yet - create a new circuit
         circuitSetArray.push(new Set([from, to]))
     }
-})
-
-// now I need to sort by size and get the size
-const sortedCircuitSet = circuitSetArray.sort((a, b) => b.size - a.size)
-console.log({ sortedCircuitSet })
-let answer = 1
-for (let i = 0; i < 3; i++) {
-    const size = sortedCircuitSet[i].size
-    answer *= size
-    console.log({ size })
+    if (circuitSetArray.some((set) => set.size === junctionData.length)) {
+        const answer = getCoordinate(from)[0] * getCoordinate(to)[0]
+        console.log({ answer })
+        break
+    }
 }
-// 5780 is too low
-console.log(answer)
+
+// // now I need to sort by size and get the size
+// const sortedCircuitSet = circuitSetArray.sort((a, b) => b.size - a.size)
+// console.log({ sortedCircuitSet })
+// let answer = 1
+// for (let i = 0; i < 3; i++) {
+//     const size = sortedCircuitSet[i].size
+//     answer *= size
+//     console.log({ size })
+// }
+
+// console.log(answer)
 console.timeEnd('runtime')
