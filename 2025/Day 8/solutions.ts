@@ -1,7 +1,7 @@
 import fs from 'fs'
 
 console.time('runtime')
-const MAX_CONNECTION = 10
+const MAX_CONNECTION = 1000
 type Coordinate = [number, number, number]
 type DistanceObject = { from: string; to: string; distance: number }
 
@@ -47,44 +47,44 @@ for (let i = 0; i < junctionData.length; i++) {
         sortedInsert(allDistances, description)
     }
 }
+console.log({ allDistances })
 // now i have the shortest connections, need to create circuits
 
 const circuitSetArray: Array<Set<string>> = []
 allDistances.forEach((connection) => {
     const { from, to } = connection
-    let hasBeenAdded = false
-    for (const circuit of circuitSetArray) {
-        if (circuit.has(from) || circuit.has(to)) {
-            circuit.add(from)
-            circuit.add(to)
-            hasBeenAdded = true
+
+    // find which existing circuits contain 'from' and 'to'
+    const fromCircuit = circuitSetArray.find((circuit) => circuit.has(from))
+    const toCircuit = circuitSetArray.find((circuit) => circuit.has(to))
+
+    if (fromCircuit && toCircuit) {
+        // both already in circuits - merge toCircuit into fromCircuit if they're different
+        if (fromCircuit !== toCircuit) {
+            toCircuit.forEach((node) => fromCircuit.add(node))
+            circuitSetArray.splice(circuitSetArray.indexOf(toCircuit), 1)
         }
+    } else if (fromCircuit) {
+        // only 'from' has a circuit - add 'to' to it
+        fromCircuit.add(to)
+    } else if (toCircuit) {
+        // only 'to' has a circuit - add 'from' to it
+        toCircuit.add(from)
+    } else {
+        // neither exists yet - create a new circuit
+        circuitSetArray.push(new Set([from, to]))
     }
-    if (!hasBeenAdded) circuitSetArray.push(new Set([from, to]))
 })
 
-// now I need to check for  for duplicates in the set and merge them
-for (let i = 0; i < circuitSetArray.length; i++) {
-    const circuit1 = circuitSetArray[i]
-    for (let j = i + 1; j < circuitSetArray.length; j++) {
-        const circuit2 = circuitSetArray[j]
-        const hasOverLap = [...circuit1].some((val) => circuit2.has(val))
-        if (hasOverLap) {
-            circuitSetArray[i] = new Set([...circuit1, ...circuit2])
-            circuitSetArray.splice(j, 1)
-            j-- // since we removed an element.
-        }
-    }
-}
-console.log({ circuitSetArray })
 // now I need to sort by size and get the size
-circuitSetArray.sort((a, b) => b.size - a.size)
+const sortedCircuitSet = circuitSetArray.sort((a, b) => b.size - a.size)
+console.log({ sortedCircuitSet })
 let answer = 1
 for (let i = 0; i < 3; i++) {
-    const size = circuitSetArray[i].size
+    const size = sortedCircuitSet[i].size
     answer *= size
     console.log({ size })
 }
-
+// 5780 is too low
 console.log(answer)
 console.timeEnd('runtime')
