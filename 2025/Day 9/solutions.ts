@@ -20,7 +20,7 @@ tileData.forEach((line, index) => {
     }
 })
 
-console.log({ max })
+// console.log({ max })
 
 // Part 2: color in the shape made by all the vertices,
 // what is the largest area of the rectangle that cna be made
@@ -74,7 +74,7 @@ for (let i = 0; i < transformedPoints.length; i++) {
     if (point1.y == point2.y) {
         const [x0, x1] = [point1.x, point2.x].sort((a, b) => a - b)
         for (let x = x0; x <= x1; x++) {
-            grid[x][point1.y] = '#'
+            grid[point1.y][x] = '#'
         }
     }
 }
@@ -85,10 +85,43 @@ console.log({ grid })
 // first find inside point
 const insidePoint = getInsidePoint(grid)
 // then fill
-
+floodFill(grid, insidePoint)
 // check all point pairs, find the largest enclosed rectangle
+// assumes the points are diagonal points from each other
+let maxArea = 0
+for (let i = 0; i < transformedPoints.length; i++) {
+    const point1 = transformedPoints[i]
+    for (let j = i + 1; j < transformedPoints.length; j++) {
+        const point2 = transformedPoints[j]
+        if (isEnclosed(point1, point2, grid)) {
+            const area = getArea(point1, point2)
+            if (area > maxArea) maxArea = area
+        }
+    }
+}
 
+console.log({ maxArea })
 // helpers
+function getArea(point1: Point, point2: Point) {
+    // points need to be changed back to the original coordinates
+    const pt1X = uniqueX[point1.x]
+    const pt1Y = uniqueY[point1.y]
+    const pt2X = uniqueX[point2.x]
+    const pt2Y = uniqueY[point2.y]
+
+    return (Math.abs(pt1X - pt2X) + 1) * (Math.abs(pt1Y - pt2Y) + 1)
+}
+function isEnclosed(point1: Point, point2: Point, grid: string[][]) {
+    const [x1, x2] = [point1.x, point2.x].sort((a, b) => a - b)
+    const [y1, y2] = [point1.y, point2.y].sort((a, b) => a - b)
+    for (let x = x1; x <= x2; x++) {
+        if (grid[y1][x] === '.' || grid[y2][x] === '.') return false
+    }
+    for (let y = y1; y <= y2; y++) {
+        if (grid[y][x1] === '.' || grid[y][x2] === '.') return false
+    }
+    return true
+}
 function floodFill(grid: string[][], start: Point) {
     const stack = [start]
     const dirs = [
@@ -113,6 +146,7 @@ function floodFill(grid: string[][], start: Point) {
     }
 }
 
+// raycasting
 function getInsidePoint(grid: string[][]): Point {
     for (let y = 0; y < grid.length; y++) {
         for (let x = 0; x < grid[0].length; x++) {
@@ -129,6 +163,7 @@ function getInsidePoint(grid: string[][]): Point {
                 prev = cur
             }
 
+            // odd number means inside
             if (hitsLeft % 2 === 1) {
                 return { x, y }
             }
