@@ -27,8 +27,8 @@ for (const line of schematic) {
     const visited = new Set<string>()
 
     while (patternsToCheck.length) {
-        console.log({ patternsToCheck })
-        const current = patternsToCheck.pop()!
+        // need to take from the front of the line to get shortest path
+        const current = patternsToCheck.shift()!
         const currentLight = current.light
         if (visited.has(currentLight)) continue // skip already seen patterns
         visited.add(currentLight)
@@ -38,31 +38,19 @@ for (const line of schematic) {
             totalButtonPresses += buttonPresses
             break
         }
-        // get the positions of the lights that we want to be toggled
-        // const positions = getIndicesToChange(desiredLightPattern, currentLight)
-        // console.log({ positions })
-        // // search for buttons that contain the positions
-        // const filteredButtons = buttons.filter((button) => positions.some((position) => button.includes(position)))
-        // console.log({ filteredButtons })
 
         // get the list of lights we want to be on compared to existing scenario after button is pressed
         for (const button of buttons) {
             const newLight = {
                 light: getNewLight(currentLight, button),
-                presses: (current?.presses || 0) + 1
+                presses: current.presses + 1
             }
             patternsToCheck.push(newLight)
         }
     }
 }
 console.log({ totalButtonPresses })
-function getIndicesToChange(desiredLightPattern: string, currentLight: string) {
-    const indices: string[] = []
-    for (let i = 0; i < desiredLightPattern.length; i++) {
-        if (desiredLightPattern[i] !== currentLight[i]) indices.push(String(i))
-    }
-    return indices
-}
+
 function getNewLight(light: string, button: string) {
     const newLight = [...light]
     for (const strIndex of button.split(',')) {
